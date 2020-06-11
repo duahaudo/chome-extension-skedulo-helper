@@ -1,5 +1,5 @@
 // @ts-nocheck
-/*global chrome copy*/
+/*global chrome*/
 import './style.scss';
 
 import React from 'react';
@@ -7,10 +7,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy } from '@fortawesome/free-solid-svg-icons'
 import { copyTextToClipboard } from '../helper';
+import SdkHandler from "../sdk-handler"
+import Context from "../context"
+import Loading from "../loading"
 
 function App() {
 
   const [authToken, setAuthToken] = useState({})
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!chrome || !chrome.tabs) {
@@ -33,18 +37,28 @@ function App() {
   const idToken = useMemo(() => authToken.idToken || null, [authToken])
 
   return (
-    <div className="app d-flex flex-column">
-      <div className="header bg-info text-white p-2">
-        <h4>Sked tools by Stiger</h4>
-      </div>
-      <div className="body p-2 d-flex flex-column">
-        <div className="copy-token">
-          <h5>Copy Token</h5>
-          <button className="btn btn-primary mr-1" onClick={() => copyTextToClipboard(accessToken)}><FontAwesomeIcon icon={faCopy} /> Session Token</button>
-          <button className="btn btn-success" onClick={() => copyTextToClipboard(idToken)}><FontAwesomeIcon icon={faCopy} /> User Token</button>
+    <>
+      <Context.Provider value={{ setLoading }}>
+        <div className={"app d-flex flex-column " + (loading && "blur")} >
+          <div className="header bg-info text-white p-2">
+            <h5 className="m-0">Sked tools by Stiger</h5>
+          </div>
+          <div className="body p-2 d-flex flex-column">
+            <div className="copy-token">
+              <h6 className="text-muted">Copy Token</h6>
+              <button className="btn btn-primary mr-1" onClick={() => copyTextToClipboard(accessToken)}><FontAwesomeIcon icon={faCopy} /> Session Token</button>
+              <button className="btn btn-success" onClick={() => copyTextToClipboard(idToken)}><FontAwesomeIcon icon={faCopy} /> User Token</button>
+            </div>
+
+            <div className="sked-sdk mt-2">
+              <SdkHandler accessToken={accessToken} />
+            </div>
+          </div>
+
         </div>
-      </div>
-    </div>
+      </Context.Provider>
+      {loading && <Loading />}
+    </>
   );
 }
 
