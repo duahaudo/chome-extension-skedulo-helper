@@ -34,7 +34,7 @@ function App() {
 
   return (
     <div className="app d-flex flex-column">
-      <div className="header bg-primary text-white p-2">
+      <div className="header bg-info text-white p-2">
         <h4>Sked tools by Stiger</h4>
       </div>
       <div className="body p-2 d-flex flex-column">
