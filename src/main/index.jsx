@@ -10,6 +10,7 @@ import { copyTextToClipboard } from '../helper';
 import SdkHandler from "../sdk-handler"
 import Context from "../context"
 import Loading from "../loading"
+import CfHandler from "../cf-handler"
 
 function App() {
 
@@ -52,6 +53,10 @@ function App() {
 
             <div className="sked-sdk mt-2">
               <SdkHandler accessToken={accessToken} />
+            </div>
+
+            <div className="sked-sdk mt-2">
+              <CfHandler accessToken={accessToken} />
             </div>
           </div>
 

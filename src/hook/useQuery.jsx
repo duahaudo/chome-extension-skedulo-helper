@@ -8,9 +8,10 @@ export default ({ token, options }) => {
   const instance = useMemo(() => axios.create({
     baseURL: "https://api.skedulo.com",
     headers: {
+      ...(options.headers || {}),
       Authorization: `Bearer ${token}`
     }
-  }), [token])
+  }), [token, options.headers])
 
   useEffect(() => {
 
@@ -19,6 +20,14 @@ export default ({ token, options }) => {
     }
 
     setLoading(true)
+
+    console.log(instance)
+    console.log(options)
+    console.log({
+      url: options.api,
+      method: options.method || "get",
+      data: options.params
+    })
 
     instance({
       url: options.api,
@@ -30,7 +39,7 @@ export default ({ token, options }) => {
     })
 
     return () => { }
-  }, [instance, options])
+  }, [instance, options, token])
 
   return [loading, fetchedData]
 }
