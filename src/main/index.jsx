@@ -5,7 +5,7 @@ import './style.scss';
 import React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCopy } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faExternalLinkSquareAlt } from '@fortawesome/free-solid-svg-icons'
 import { copyTextToClipboard } from '../helper';
 import SdkHandler from "../sdk-handler"
 import Context from "../context"
@@ -29,6 +29,7 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   const [skedLocalStorage, setSkedLocalStorage] = useState(mock);
+  const [isSked, setIsSked] = useState(false)
 
   useEffect(() => {
     if (!chrome || !chrome.tabs) {
@@ -41,6 +42,9 @@ function App() {
           // console.log('skedLocalStorage', localStorageData)
           setSkedLocalStorage(localStorageData)
         });
+        setIsSked(true)
+      } else {
+        setIsSked(false)
       }
     })
   }, [skedLocalStorage])
@@ -48,6 +52,10 @@ function App() {
   const auth = useMemo(() => skedLocalStorage.auth ? JSON.parse(skedLocalStorage.auth) : {}, [skedLocalStorage])
   const accessToken = useMemo(() => auth.skedApiAccessToken || null, [auth])
   const idToken = useMemo(() => auth.idToken || null, [auth])
+
+  if (!isSked) {
+    return <div className="btn btn-success bg-white btn-block"><a href="https://new.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>
+  }
 
   return (
     <>
