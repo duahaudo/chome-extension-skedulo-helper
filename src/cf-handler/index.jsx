@@ -188,7 +188,7 @@ const ManageCF = ({ forms, setForms }) => {
           <div className="flex-fill p-1">
             <SelectComp jobTypes={jobTypes} existSelected={formJobTypes} onChange={(selectedOptions) => linkFormHandler(form.id, selectedOptions)} />
           </div>
-          <div className="align-self-center">
+          <div className="align-self-center d-flex">
             <button className="btn-sm bg-primary border-0 text-white m-1" onClick={() => saveFormLink(form)}><FontAwesomeIcon icon={faSave} /> </button>
             <button className="btn-sm bg-danger border-0 text-white m-1" onClick={() => removeForm(form)}><FontAwesomeIcon icon={faTrashAlt} /> </button>
           </div>
