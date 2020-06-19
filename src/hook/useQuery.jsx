@@ -1,7 +1,9 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useContext } from 'react'
+import Context from "../context"
 import axios from "axios"
 
-export default ({ token, options }) => {
+export default ({ options }) => {
+  const { accessToken } = useContext(Context)
   const [loading, setLoading] = useState(false)
   const [fetchedData, setFetchedData] = useState()
 
@@ -9,37 +11,52 @@ export default ({ token, options }) => {
     baseURL: "https://api.skedulo.com",
     headers: {
       ...(options.headers || {}),
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${accessToken}`
     }
-  }), [token, options.headers])
+  }), [accessToken, options.headers])
 
   useEffect(() => {
+    if (!options.bulkQuery) {
+      if (!options.api || !accessToken) {
+        return;
+      }
 
-    if (!options.api || !token) {
-      return;
+      setLoading(true)
+
+      instance({
+        url: options.api,
+        method: options.method || "get",
+        params: options.params,
+        data: options.data
+      }).then((response) => {
+        setLoading(false)
+        setFetchedData(response.data)
+      }).catch((e) => {
+        setLoading(false)
+        setFetchedData(e)
+      })
+    } else {
+      setLoading(true)
+
+      const promises = options.options.map(opt => {
+        return instance({
+          ...opt,
+          url: opt.api,
+          method: opt.method || "get"
+        })
+      })
+
+      axios.all(promises).then((response) => {
+        setLoading(false)
+        setFetchedData(response.data)
+      }).catch((e) => {
+        setLoading(false)
+        setFetchedData(e)
+      })
     }
 
-    setLoading(true)
-
-    console.log(instance)
-    console.log(options)
-    console.log({
-      url: options.api,
-      method: options.method || "get",
-      data: options.params
-    })
-
-    instance({
-      url: options.api,
-      method: options.method || "get",
-      data: options.params
-    }).then((response) => {
-      setLoading(false)
-      setFetchedData(response.data)
-    })
-
     return () => { }
-  }, [instance, options, token])
+  }, [instance, options, accessToken])
 
   return [loading, fetchedData]
 }

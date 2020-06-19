@@ -15,7 +15,7 @@ export default ({ accessToken }) => {
       setQueryOptions({
         api: "https://localhost:1928/session/start",
         method: "post",
-        params: { "REALTIME_SERVER": "https://api.skedulo.com", "API_SERVER": "https://api.skedulo.com" }
+        data: { "REALTIME_SERVER": "https://api.skedulo.com", "API_SERVER": "https://api.skedulo.com" }
       })
     },
     [],
