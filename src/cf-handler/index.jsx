@@ -1,16 +1,20 @@
+// @ts-nocheck
+/*global chrome*/
+
 import "./style.scss"
 
-import React, { useCallback, useState, useContext, useEffect, useRef } from 'react'
+import React, { useCallback, useState, useContext, useEffect, useRef, useMemo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faLink, faTrashAlt, faSave, faWindowClose } from '@fortawesome/free-solid-svg-icons'
-import Select from 'react-select'
-import _ from "lodash"
+import { faUpload, faLink, faWindowClose, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import $ from "jquery"
 
 import useQuery from "../hook/useQuery"
 import Context from "../context"
+import ManageCF from "./manageCustomForm"
 
-export default ({ }) => {
+const getLink = (jobType) => `https://api.skedulo.com/api/Jobs?limit=3&filter=(JobStatus != "Complete" AND JobStatus != "Cancelled" ${jobType ? ` AND Type == "${jobType}"` : ""})&fieldNames=UID, Name&onlyFields=true&orderBy=Name DESC`
+
+export default () => {
 
   const { setLoading } = useContext(Context)
   const [queryOptions, setQueryOptions] = useState({})
@@ -75,6 +79,8 @@ export default ({ }) => {
     }
   }, [loading, markDownload])
 
+  const [queryJob, setQueryJob] = useState(getLink())
+
   useEffect(() => {
     if (!loading) {
       switch (queryOptions.api) {
@@ -84,16 +90,43 @@ export default ({ }) => {
           }
           break;
         }
-
+        case queryJob: {
+          if (fetchedData && fetchedData.Jobs.records) {
+            const job = fetchedData.Jobs.records[0];
+            console.log(job.UID)
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` });
+            })
+          }
+          break;
+        }
         default:
       }
     }
 
-  }, [fetchedData, queryOptions, loading])
+  }, [fetchedData, queryOptions, loading, queryJob])
+
+  const openJobHandler = useCallback((type) => {
+    setQueryJob(getLink(type))
+    setQueryOptions({
+      api: getLink(type),
+      type: "get",
+      timestampe: Date.now()
+    })
+  }, [])
 
   return (
     <div className="cf-wrapper">
       <h6 className="text-muted">Custom Form</h6>
+
+      <div className="btn-group mr-1 mb-1" role="group">
+        <button className="btn btn-warning" onClick={() => openJobHandler()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Job </button>
+        <button className="btn btn-info" onClick={() => openJobHandler("Single Booking")}>Single Booking </button>
+        <button className="btn btn-success" onClick={() => openJobHandler("Group Event")}>Group Event </button>
+      </div>
+
+      <div />
+
       <button className="btn btn-primary mr-1" onClick={() => uploadHandler()}><FontAwesomeIcon icon={faUpload} /> Deploy </button>
       <button className="btn btn-secondary mr-1" onClick={() => viewCFPanelHandler()}><FontAwesomeIcon icon={faLink} /> Manage </button>
 
@@ -102,114 +135,5 @@ export default ({ }) => {
         <button className="btn btn-success m-2 float-right" onClick={() => viewCFPanelHandler()}><FontAwesomeIcon icon={faWindowClose} /> Close </button>
       </div>}
     </div>
-  )
-}
-
-const ManageCF = ({ forms, setForms }) => {
-
-  const { skedLocalStorage, setLoading } = useContext(Context)
-  const jobTypes = JSON.parse(skedLocalStorage["sked-default.schemaVocab"]).value.Jobs.Type
-  const [queryOptions, setQueryOptions] = useState({})
-  const [loading, fetchedData] = useQuery({ options: queryOptions })
-  const [linkForms, setLinkForms] = useState([])
-
-  useEffect(() => {
-    setLoading(loading)
-  }, [loading, setLoading])
-
-  const linkFormHandler = useCallback((formId, selectedOptions) => {
-    console.log(selectedOptions)
-    const newLinkForms = [...linkForms]
-    const existItem = newLinkForms.find(item => item.formId === formId);
-
-    if (existItem) {
-      existItem.jobTypes = (selectedOptions || []).map(item => item.value)
-    } else {
-      newLinkForms.push({
-        formId, jobTypes: (selectedOptions || []).map(item => item.value)
-      })
-    }
-
-    setLinkForms([...newLinkForms])
-  }, [linkForms])
-
-  const saveFormLink = useCallback((form) => {
-    const updatedForm = linkForms.find(f => f.formId === form.id)
-    const removedJobType = _.difference(form.jobTypes, updatedForm.jobTypes)
-    const addedJobTypes = _.difference(updatedForm.jobTypes, form.jobTypes)
-
-    let options = []
-
-    addedJobTypes.forEach(jobType => {
-      options.push({
-        api: "/customform/link_form",
-        method: "POST",
-        data: {
-          formId: form.formRev.formId,
-          jobTypeName: jobType
-        }
-      })
-    })
-    removedJobType.forEach(jobType => {
-      options.push({
-        api: "/customform/link_form",
-        method: "DELETE",
-        params: {
-          form_id: form.formRev.formId,
-          job_type_name: jobType
-        }
-      })
-    })
-
-    setQueryOptions({
-      bulkQuery: true,
-      options
-    })
-  }, [linkForms])
-
-  const removeForm = useCallback((form) => {
-    setQueryOptions({
-      api: "/customform/form/" + form.formRev.formId,
-      method: "DELETE"
-    })
-
-    const newFormLst = _.reject(forms, item => item.formRev.formId === form.formRev.formId)
-    setForms(newFormLst)
-  }, [forms, setForms])
-
-  return (
-    <div className="lst-custom-form">
-      {(forms || []).map(form => {
-        const name = form.formRev.definition.forms.map(item => item.name).join('\n')
-        const formJobTypes = jobTypes.filter(item => form.jobTypes.indexOf(item.value) > -1)
-
-        return <div key={form.id} className="d-flex border-bottom small">
-          <div className="col-3 align-self-center">{name}</div>
-          <div className="flex-fill p-1">
-            <SelectComp jobTypes={jobTypes} existSelected={formJobTypes} onChange={(selectedOptions) => linkFormHandler(form.id, selectedOptions)} />
-          </div>
-          <div className="align-self-center d-flex">
-            <button className="btn-sm bg-primary border-0 text-white m-1" onClick={() => saveFormLink(form)}><FontAwesomeIcon icon={faSave} /> </button>
-            <button className="btn-sm bg-danger border-0 text-white m-1" onClick={() => removeForm(form)}><FontAwesomeIcon icon={faTrashAlt} /> </button>
-          </div>
-        </div>
-      })}
-    </div>
-  )
-}
-const SelectComp = ({ jobTypes, existSelected, onChange }) => {
-  const [selected, setSelected] = useState(existSelected)
-
-  // console.log(selected, existSelected)
-
-  return (
-    <>
-      <Select options={jobTypes} isMulti closeMenuOnSelect={false}
-        value={selected}
-        onChange={(selectedOptions) => {
-          setSelected(selectedOptions)
-          onChange(selectedOptions)
-        }} />
-    </>
   )
 }
