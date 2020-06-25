@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useContext, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrashAlt, faSave } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt, faSave, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
 import _ from "lodash"
 import Select from 'react-select'
 import useQuery from "../hook/useQuery"
@@ -21,7 +21,7 @@ export default ({ forms, setForms }) => {
   }, [loading, setLoading])
 
   const linkFormHandler = useCallback((formId, selectedOptions) => {
-    console.log(selectedOptions)
+    // console.log(selectedOptions)
     const newLinkForms = [...linkForms]
     const existItem = newLinkForms.find(item => item.formId === formId);
 
@@ -85,11 +85,14 @@ export default ({ forms, setForms }) => {
       {(forms || []).map(form => {
         const name = form.formRev.definition.forms.map(item => item.name).join('\n')
         const formJobTypes = jobTypes.filter(item => form.jobTypes.indexOf(item.value) > -1)
+        const isMenuForm = form.formRev.definition.deploy && (form.formRev.definition.deploy.context === "resource")
+
+        console.log(isMenuForm)
 
         return <div key={form.id} className="d-flex border-bottom small">
-          <div className="col-3 align-self-center">{name}</div>
+          <div className="col-3 align-self-center">{isMenuForm && <FontAwesomeIcon icon={faEllipsisV} />} {name}</div>
           <div className="flex-fill p-1 jobtype-row">
-            <SelectComp jobTypes={jobTypes} existSelected={formJobTypes} onChange={(selectedOptions) => linkFormHandler(form.id, selectedOptions)} />
+            <SelectComp jobTypes={jobTypes} disabled={isMenuForm} existSelected={formJobTypes} onChange={(selectedOptions) => linkFormHandler(form.id, selectedOptions)} />
           </div>
           <div className="align-self-center d-flex">
             <button className="btn-sm bg-primary border-0 text-white m-1" onClick={() => saveFormLink(form)}><FontAwesomeIcon icon={faSave} /> </button>
@@ -100,7 +103,7 @@ export default ({ forms, setForms }) => {
     </div>
   )
 }
-const SelectComp = ({ jobTypes, existSelected, onChange }) => {
+const SelectComp = ({ jobTypes, existSelected, onChange, disabled }) => {
   const [selected, setSelected] = useState(existSelected)
 
   // console.log(selected, existSelected)
@@ -109,6 +112,7 @@ const SelectComp = ({ jobTypes, existSelected, onChange }) => {
     <>
       <Select options={jobTypes} isMulti closeMenuOnSelect={false}
         value={selected}
+        isDisabled={disabled}
         onChange={(selectedOptions) => {
           setSelected(selectedOptions)
           onChange(selectedOptions)
