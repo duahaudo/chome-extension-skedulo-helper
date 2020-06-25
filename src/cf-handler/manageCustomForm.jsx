@@ -87,8 +87,6 @@ export default ({ forms, setForms }) => {
         const formJobTypes = jobTypes.filter(item => form.jobTypes.indexOf(item.value) > -1)
         const isMenuForm = form.formRev.definition.deploy && (form.formRev.definition.deploy.context === "resource")
 
-        console.log(isMenuForm)
-
         return <div key={form.id} className="d-flex border-bottom small">
           <div className="col-3 align-self-center">{isMenuForm && <FontAwesomeIcon icon={faEllipsisV} />} {name}</div>
           <div className="flex-fill p-1 jobtype-row">
