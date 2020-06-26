@@ -59,7 +59,7 @@ function App() {
 
   return (
     <>
-      <Context.Provider value={{ setLoading, skedLocalStorage, accessToken }}>
+      <Context.Provider value={{ setLoading, skedLocalStorage, accessToken, idToken }}>
         <div className={"app d-flex flex-column " + (loading && "blur")} >
           <div className="header bg-info text-white p-2">
             <h5 className="m-0">Sked tools by Stiger</h5>

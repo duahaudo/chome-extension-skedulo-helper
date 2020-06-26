@@ -16,7 +16,7 @@ const getLink = (jobType) => `https://api.skedulo.com/api/Jobs?limit=3&filter=(J
 
 export default () => {
 
-  const { setLoading } = useContext(Context)
+  const { setLoading, idToken } = useContext(Context)
   const [queryOptions, setQueryOptions] = useState({})
   const [loading, fetchedData] = useQuery({ options: queryOptions })
   const [markDownload, setMarkDownload] = useState(false)
@@ -95,7 +95,9 @@ export default () => {
             const job = fetchedData.Jobs.records[0];
             console.log(job.UID)
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` });
+              chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` }, (tab) => {
+                chrome.tabs.executeScript(tab.id, { code: `SetIdToken("${idToken}")` });
+              })
             })
           }
           break;
@@ -104,7 +106,7 @@ export default () => {
       }
     }
 
-  }, [fetchedData, queryOptions, loading, queryJob])
+  }, [fetchedData, queryOptions, loading, queryJob, idToken])
 
   const openJobHandler = useCallback((type) => {
     setQueryJob(getLink(type))
