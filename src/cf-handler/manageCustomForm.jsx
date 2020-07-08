@@ -1,9 +1,10 @@
 import React, { useCallback, useState, useContext, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrashAlt, faSave, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt, faSave, faEllipsisV, faFileDownload } from '@fortawesome/free-solid-svg-icons'
 import _ from "lodash"
 import Select from 'react-select'
 import useQuery from "../hook/useQuery"
+import useDownload from "../hook/useDownload"
 import Context from "../context"
 
 export default ({ forms, setForms }) => {
@@ -14,7 +15,8 @@ export default ({ forms, setForms }) => {
   const [loading, fetchedData] = useQuery({ options: queryOptions })
   const [linkForms, setLinkForms] = useState([])
 
-
+  const [downloadOpt, setDownloadOpt] = useState("")
+  const [loading2, fetchedDownload] = useDownload(downloadOpt)
 
   useEffect(() => {
     setLoading(loading)
@@ -80,6 +82,16 @@ export default ({ forms, setForms }) => {
     setForms(newFormLst)
   }, [forms, setForms])
 
+  const downloadForm = useCallback((form) => {
+    setDownloadOpt(form.formRev.id)
+  }, [])
+
+  useEffect(() => {
+    if (!loading2 && !!fetchedData) {
+      console.log(fetchedData)
+    }
+  }, [fetchedData])
+
   return (
     <div className="lst-custom-form">
       {(forms || []).map(form => {
@@ -94,6 +106,7 @@ export default ({ forms, setForms }) => {
           </div>
           <div className="align-self-center d-flex">
             <button className="btn-sm bg-primary border-0 text-white m-1" onClick={() => saveFormLink(form)}><FontAwesomeIcon icon={faSave} /> </button>
+            {/* <button className="btn-sm bg-success border-0 text-white m-1" onClick={() => downloadForm(form)}><FontAwesomeIcon icon={faFileDownload} /> </button> */}
             <button className="btn-sm bg-danger border-0 text-white m-1" onClick={() => removeForm(form)}><FontAwesomeIcon icon={faTrashAlt} /> </button>
           </div>
         </div>

@@ -5,7 +5,7 @@ import "./style.scss"
 
 import React, { useCallback, useState, useContext, useEffect, useRef, useMemo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faLink, faWindowClose, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { faUpload, faLink, faTimes, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import $ from "jquery"
 
 import useQuery from "../hook/useQuery"
@@ -122,7 +122,7 @@ export default () => {
       <h6 className="text-muted">Custom Form</h6>
 
       <div className="btn-group mr-1 mb-1" role="group">
-        <button className="btn btn-warning" onClick={() => openJobHandler()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Job </button>
+        <button className="btn btn-warning text-white" onClick={() => openJobHandler()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Job </button>
         <button className="btn btn-info" onClick={() => openJobHandler("Single Booking")}>Single Booking </button>
         <button className="btn btn-success" onClick={() => openJobHandler("Group Event")}>Group Event </button>
       </div>
@@ -134,7 +134,7 @@ export default () => {
 
       {showManage && <div ref={ref} className="panel">
         <ManageCF forms={forms} setForms={setForms} />
-        <button className="btn btn-success m-2 float-right" onClick={() => viewCFPanelHandler()}><FontAwesomeIcon icon={faWindowClose} /> Close </button>
+        <button className="btn btn-dark m-2 float-right" onClick={() => viewCFPanelHandler()}><FontAwesomeIcon icon={faTimes} /> Close </button>
       </div>}
     </div>
   )
