@@ -2,10 +2,10 @@
 /*global chrome*/
 import './style.scss';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCopy, faExternalLinkSquareAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faExternalLinkSquareAlt, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import { copyTextToClipboard } from '../helper';
 import SdkHandler from "../sdk-handler"
 import Context from "../context"
@@ -53,6 +53,22 @@ function App() {
   const accessToken = useMemo(() => auth.skedApiAccessToken || null, [auth])
   const idToken = useMemo(() => auth.idToken || null, [auth])
 
+  const openLink = useCallback((link) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tab = tabs[0]
+      const protocols = tab.url.split("//")[0];
+      const domain = tab.url.split("//")[1].split('/')[0]
+      chrome.tabs.create({ url: `${protocols}//${domain}/${link}` });
+    })
+  }, [])
+
+  const openSalesforces = useCallback(() => {
+    const link = document.querySelectorAll('a[data-sk-name=external-nav-link]')[0]
+    if (link) {
+      chrome.tabs.create({ url: link });
+    }
+  }, [])
+
   if (!isSked) {
     return <div className="btn btn-success bg-white btn-block"><a href="https://new.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>
   }
@@ -66,7 +82,7 @@ function App() {
           </div>
           <div className="body p-2 d-flex flex-column">
             <div className="copy-token">
-              <h6 className="text-muted">Copy Token</h6>
+              <h6 className="text-muted">Copy</h6>
               <button className="btn btn-primary mr-1" onClick={() => copyTextToClipboard(accessToken)}><FontAwesomeIcon icon={faCopy} /> Session Token</button>
               <button className="btn btn-success" onClick={() => copyTextToClipboard(idToken)}><FontAwesomeIcon icon={faCopy} /> User Token</button>
             </div>
@@ -77,6 +93,17 @@ function App() {
 
             <div className="sked-sdk mt-2">
               <CfHandler />
+            </div>
+            <div className="sked-sdk mt-2">
+              <h6 className="text-muted">Links</h6>
+
+              <div className="mr-1 mb-1" role="group">
+                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('c/g/manage-pkg')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Manage Package </button>
+                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/dataobjects')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Custom Fields Mapping </button>
+                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/extensions/mobile')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Extensions </button>
+                {/* <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openSalesforces()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Salesforce </button> */}
+
+              </div>
             </div>
           </div>
 
