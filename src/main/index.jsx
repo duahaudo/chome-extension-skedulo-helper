@@ -101,6 +101,7 @@ function App() {
                 <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('c/g/manage-pkg')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Manage Package </button>
                 <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/dataobjects')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Custom Fields Mapping </button>
                 <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/extensions/mobile')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Extensions </button>
+                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/developer/api-token')}><FontAwesomeIcon icon={faExternalLinkAlt} /> API Token </button>
                 {/* <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openSalesforces()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Salesforce </button> */}
 
               </div>
