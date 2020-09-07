@@ -63,11 +63,11 @@ function App() {
   }, [])
 
   const openSalesforces = useCallback(() => {
-    const link = document.querySelectorAll('a[data-sk-name=external-nav-link]')[0]
+    const link = auth.sfdc && auth.sfdc.instance_url;
     if (link) {
       chrome.tabs.create({ url: link });
     }
-  }, [])
+  }, [auth])
 
   if (!isSked) {
     return <div className="btn btn-success bg-white btn-block"><a href="https://new.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>
@@ -95,14 +95,14 @@ function App() {
               <CfHandler />
             </div>
             <div className="sked-sdk mt-2">
-              <h6 className="text-muted">Links</h6>
+              <h6 className="text-muted">Quick Jumps</h6>
 
               <div className="mr-1 mb-1" role="group">
                 <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('c/g/manage-pkg')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Manage Package </button>
-                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/dataobjects')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Custom Fields Mapping </button>
-                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/extensions/mobile')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Extensions </button>
-                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/developer/api-token')}><FontAwesomeIcon icon={faExternalLinkAlt} /> API Token </button>
-                {/* <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openSalesforces()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Salesforce </button> */}
+                <button className="btn btn-secondary text-white mr-1 mb-1" onClick={() => openLink('settings/dataobjects')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Custom Fields Mapping </button>
+                <button className="btn btn-success text-white mr-1 mb-1" onClick={() => openLink('settings/extensions/mobile')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Extensions </button>
+                <button className="btn btn-danger text-white mr-1 mb-1" onClick={() => openLink('settings/developer/api-token')}><FontAwesomeIcon icon={faExternalLinkAlt} /> API Token </button>
+                <button className="btn btn-warning text-white mr-1 mb-1" onClick={() => openSalesforces()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Salesforce </button>
 
               </div>
             </div>
