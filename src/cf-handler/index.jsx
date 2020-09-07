@@ -7,6 +7,7 @@ import React, { useCallback, useState, useContext, useEffect, useRef, useMemo } 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faLink, faTimes, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import $ from "jquery"
+import { each } from "lodash"
 
 import useQuery from "../hook/useQuery"
 import Context from "../context"
@@ -27,11 +28,16 @@ export default () => {
 
   const uploadHandler = useCallback(() => {
     var input = document.createElement('input');
+    input.multiple = "multiple";
     input.type = 'file';
     input.click();
 
     input.onchange = e => {
-      var file = e.target.files[0];
+      var { files } = e.target;
+      each(files, uploadHandler)
+    }
+
+    const uploadHandler = (file) => {
       var bodyFormData = new FormData();
       bodyFormData.set('file', file);
 
@@ -59,7 +65,7 @@ export default () => {
         type: "get",
         timestampe: Date.now()
       })
-      setMarkDownload(true)
+      // setMarkDownload(true)
     } else {
       $(ref.current)[newState ? "slideDown" : "slideUp"]()
       setTimeout(() => setShowManage(newState), 400)
@@ -85,8 +91,10 @@ export default () => {
     if (!loading) {
       switch (queryOptions.api) {
         case "/customform/form": {
-          if (fetchedData && fetchedData.result) {
+          if (queryOptions.type === 'get' && fetchedData && fetchedData.result) {
+            // console.log(queryOptions, fetchedData.result)
             setForms(fetchedData.result)
+            setMarkDownload(true)
           }
           break;
         }
@@ -107,6 +115,10 @@ export default () => {
     }
 
   }, [fetchedData, queryOptions, loading, queryJob, idToken])
+
+  // useEffect(() => {
+  //   console.log('forms', forms)
+  // }, [forms])
 
   const openJobHandler = useCallback((type) => {
     setQueryJob(getLink(type))

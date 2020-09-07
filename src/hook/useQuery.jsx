@@ -16,6 +16,8 @@ export default ({ options }) => {
   }), [accessToken, options.headers])
 
   useEffect(() => {
+    // console.log(options)
+
     if (!options.bulkQuery) {
       if (!options.api || !accessToken) {
         return;
@@ -29,11 +31,12 @@ export default ({ options }) => {
         params: options.params,
         data: options.data
       }).then((response) => {
+        // console.log('Query response', response.data)
+        setFetchedData({ ...response.data })
         setLoading(false)
-        setFetchedData(response.data)
       }).catch((e) => {
-        setLoading(false)
         setFetchedData(e)
+        setLoading(false)
       })
     } else {
       setLoading(true)
@@ -47,11 +50,12 @@ export default ({ options }) => {
       })
 
       axios.all(promises).then((response) => {
-        setLoading(false)
+        console.log(response.data)
         setFetchedData(response.data)
-      }).catch((e) => {
         setLoading(false)
+      }).catch((e) => {
         setFetchedData(e)
+        setLoading(false)
       })
     }
 

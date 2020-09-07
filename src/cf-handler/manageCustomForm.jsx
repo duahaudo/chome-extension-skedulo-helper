@@ -8,7 +8,6 @@ import useDownload from "../hook/useDownload"
 import Context from "../context"
 
 export default ({ forms, setForms }) => {
-
   const { skedLocalStorage, setLoading } = useContext(Context)
   const jobTypes = JSON.parse(skedLocalStorage["sked-default.schemaVocab"]).value.Jobs.Type
   const [queryOptions, setQueryOptions] = useState({})
