@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback, useContext } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faStop, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faStop, faExternalLinkAlt, faCube } from '@fortawesome/free-solid-svg-icons'
 import useQuery from "../hook/useQuery"
 import Context from "../context"
 
@@ -39,6 +39,8 @@ export default ({ accessToken }) => {
     return () => { }
   }, [loading, setLoading])
 
+  const [managePkgStatus, setManagePkgStatus] = useState(false)
+
   return <>
     <h6 className="text-muted">SDK</h6>
     <button className="btn btn-primary mr-1" onClick={() => startSdk()}><FontAwesomeIcon icon={faPlay} /> Start </button>
@@ -51,5 +53,15 @@ export default ({ accessToken }) => {
         chrome.tabs.create({ url: `${protocols}//${domain}/c-dev/` });
       })
     }}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Dev </button>
+    <button className="btn btn-warning mr-1" onClick={() => {
+      setQueryOptions({
+        api: "/package/global/manage-pkg",
+        method: "put",
+        data: {
+          active: !managePkgStatus
+        }
+      })
+      setManagePkgStatus(!managePkgStatus)
+    }}><FontAwesomeIcon icon={faCube} /> Toggle Manage Pkg</button>
   </>
 }
