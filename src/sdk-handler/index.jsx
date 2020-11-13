@@ -62,6 +62,6 @@ export default ({ accessToken }) => {
         }
       })
       setManagePkgStatus(!managePkgStatus)
-    }}><FontAwesomeIcon icon={faCube} /> Toggle Manage Pkg</button>
+    }}><FontAwesomeIcon icon={faCube} /> Turn On Manage Pkg</button>
   </>
 }
