@@ -24,6 +24,7 @@ export default ({ options }) => {
       }
 
       setLoading(true)
+      setFetchedData(null)
 
       instance({
         url: options.api,
