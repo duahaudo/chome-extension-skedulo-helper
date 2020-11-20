@@ -121,7 +121,7 @@ export default ({ accessToken }) => {
         return <button className="btn btn-info" key={idx}>
           <FontAwesomeIcon icon={currentPkg && (pkg.id === currentPkg.id) ? faEye : faEyeSlash} />
           <span onClick={() => getBuildStatus(pkg)}> {pkg.name} </span>
-          <span onClick={() => refreshStatus()}><small> {currentPkg && pkgStatus && (pkg.id === currentPkg.id) ? pkgStatus.status : ""} </small></span></button>
+          <span onClick={() => refreshStatus()}><small className="status"> {currentPkg && pkgStatus && (pkg.id === currentPkg.id) ? pkgStatus.status : ""} </small></span></button>
       })}
     </div>
   </>
