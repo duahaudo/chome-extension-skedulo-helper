@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*global chrome*/
 import './style.scss';
 
@@ -11,6 +10,10 @@ import SdkHandler from "../sdk-handler"
 import Context from "../context"
 import Loading from "../loading"
 import CfHandler from "../cf-handler"
+
+import CustomFieldMapping from "../custom-field-mapping"
+
+const customFieldMappingPage = 'custom-field-mapping'
 
 const mock = {
   "sked-default.standard-schemas": "{\"value\":[{\"name\":\"AccountResourceScores\",\"label\":\"Account Resource Scores\",\"mapping\":\"sked__Account_Resource_Score__c\"},{\"name\":\"AccountTags\",\"label\":\"Account Tags\",\"mapping\":\"sked__Account_Tag__c\"},{\"name\":\"Accounts\",\"label\":\"Accounts\",\"mapping\":\"Account\"},{\"name\":\"Activities\",\"label\":\"Activities\",\"mapping\":\"sked__Activity__c\"},{\"name\":\"ActivityResources\",\"label\":\"Activity Resources\",\"mapping\":\"sked__Activity_Resource__c\"},{\"name\":\"Attendees\",\"label\":\"Attendees\",\"mapping\":\"sked__Attendee__c\"},{\"name\":\"Availabilities\",\"label\":\"Availabilities\",\"mapping\":\"sked__Availability__c\"},{\"name\":\"AvailabilityPatternResources\",\"label\":\"Availability Pattern Resources\",\"mapping\":\"sked__Availability_Pattern_Resource__c\"},{\"name\":\"AvailabilityPatterns\",\"label\":\"Availability Patterns\",\"mapping\":\"sked__Availability_Pattern__c\"},{\"name\":\"AvailabilityTemplateEntries\",\"label\":\"Availability Template Entries\",\"mapping\":\"sked__Availability_Template_Entry__c\"},{\"name\":\"AvailabilityTemplateResources\",\"label\":\"Availability Template Resources\",\"mapping\":\"sked__Availability_Template_Resource__c\"},{\"name\":\"AvailabilityTemplates\",\"label\":\"Availability Templates\",\"mapping\":\"sked__Availability_Template__c\"},{\"name\":\"ClientAvailabilities\",\"label\":\"Client Availabilities\",\"mapping\":\"sked__Client_Availability__c\"},{\"name\":\"ContactTags\",\"label\":\"Contact Tags\",\"mapping\":\"sked__Contact_Tag__c\"},{\"name\":\"Contacts\",\"label\":\"Contacts\",\"mapping\":\"Contact\"},{\"name\":\"HolidayRegions\",\"label\":\"Holiday Regions\",\"mapping\":\"sked__Holiday_Region__c\"},{\"name\":\"Holidays\",\"label\":\"Holidays\",\"mapping\":\"sked__Holiday__c\"},{\"name\":\"JobAllocations\",\"label\":\"Job Allocations\",\"mapping\":\"sked__Job_Allocation__c\"},{\"name\":\"JobDependencies\",\"label\":\"Job Dependencies\",\"mapping\":\"sked__Job_Dependency__c\"},{\"name\":\"JobOffers\",\"label\":\"Job Offers\",\"mapping\":\"sked__Job_Offer__c\"},{\"name\":\"JobProducts\",\"label\":\"Job Products\",\"mapping\":\"sked__Job_Product__c\"},{\"name\":\"JobTags\",\"label\":\"Job Tags\",\"mapping\":\"sked__Job_Tag__c\"},{\"name\":\"JobTasks\",\"label\":\"Job Tasks\",\"mapping\":\"sked__Job_Task__c\"},{\"name\":\"JobTimeConstraints\",\"label\":\"Job Time Constraints\",\"mapping\":\"sked__Job_Time_Constraint__c\"},{\"name\":\"Jobs\",\"label\":\"Jobs\",\"mapping\":\"sked__Job__c\"},{\"name\":\"LocationResourceScores\",\"label\":\"Location Resource Scores\",\"mapping\":\"sked__Location_Resource_Score__c\"},{\"name\":\"Locations\",\"label\":\"Locations\",\"mapping\":\"sked__Location__c\"},{\"name\":\"Preferences\",\"label\":\"Preferences\",\"mapping\":\"sked__Preferences__c\"},{\"name\":\"Products\",\"label\":\"Products\",\"mapping\":\"Product2\"},{\"name\":\"RecurringSchedules\",\"label\":\"Recurring Schedules\",\"mapping\":\"sked__Recurring_Schedule__c\"},{\"name\":\"Regions\",\"label\":\"Regions\",\"mapping\":\"sked__Region__c\"},{\"name\":\"ResourceJobOffers\",\"label\":\"Resource Job Offers\",\"mapping\":\"sked__Resource_Job_Offer__c\"},{\"name\":\"ResourceOverrideRegions\",\"label\":\"Resource Override Regions\",\"mapping\":\"sked__Resource_Override_Region__c\"},{\"name\":\"ResourceOverrides\",\"label\":\"Resource Overrides\",\"mapping\":\"sked__Resource_Override__c\"},{\"name\":\"ResourceRegions\",\"label\":\"Resource Regions\",\"mapping\":\"sked__Resource_Region__c\"},{\"name\":\"ResourceRequirementTags\",\"label\":\"Resource Requirement Tags\",\"mapping\":\"sked__Resource_Requirement_Tag__c\"},{\"name\":\"ResourceRequirements\",\"label\":\"Resource Requirements\",\"mapping\":\"sked__Resource_Requirement__c\"},{\"name\":\"ResourceShiftBreaks\",\"label\":\"Resource Shift Breaks\",\"mapping\":\"sked__Resource_Shift_Break__c\"},{\"name\":\"ResourceShiftOffers\",\"label\":\"Resource Shift Offers\",\"mapping\":\"sked__Resource_Shift_Offer__c\"},{\"name\":\"ResourceShifts\",\"label\":\"Resource Shifts\",\"mapping\":\"sked__Resource_Shift__c\"},{\"name\":\"ResourceTags\",\"label\":\"Resource Tags\",\"mapping\":\"sked__Resource_Tag__c\"},{\"name\":\"Resources\",\"label\":\"Resources\",\"mapping\":\"sked__Resource__c\"},{\"name\":\"ScheduleTemplates\",\"label\":\"Schedule Templates\",\"mapping\":\"sked__Schedule_Template__c\"},{\"name\":\"ShiftOfferShifts\",\"label\":\"Shift Offer Shifts\",\"mapping\":\"sked__Shift_Offer_Shift__c\"},{\"name\":\"ShiftOffers\",\"label\":\"Shift Offers\",\"mapping\":\"sked__Shift_Offer__c\"},{\"name\":\"ShiftTags\",\"label\":\"Shift Tags\",\"mapping\":\"sked__Shift_Tag__c\"},{\"name\":\"Shifts\",\"label\":\"Shifts\",\"mapping\":\"sked__Shift__c\"},{\"name\":\"Tags\",\"label\":\"Tags\",\"mapping\":\"sked__Tag__c\"},{\"name\":\"TemplatedActivities\",\"label\":\"Templated Activities\",\"mapping\":\"sked__Templated_Activity__c\"},{\"name\":\"TemplatedActivityResources\",\"label\":\"Templated Activity Resources\",\"mapping\":\"sked__Templated_Activity_Resource__c\"},{\"name\":\"TemplatedAttendees\",\"label\":\"Templated Attendees\",\"mapping\":\"sked__Templated_Attendee__c\"},{\"name\":\"TemplatedJobAllocations\",\"label\":\"Templated Job Allocations\",\"mapping\":\"sked__Templated_Job_Allocation__c\"},{\"name\":\"TemplatedJobDependencies\",\"label\":\"Templated Job Dependencies\",\"mapping\":\"sked__Templated_Job_Dependency__c\"},{\"name\":\"TemplatedJobProducts\",\"label\":\"Templated Job Products\",\"mapping\":\"sked__Templated_Job_Product__c\"},{\"name\":\"TemplatedJobTags\",\"label\":\"Templated Job Tags\",\"mapping\":\"sked__Templated_Job_Tag__c\"},{\"name\":\"TemplatedJobTasks\",\"label\":\"Templated Job Tasks\",\"mapping\":\"sked__Templated_Job_Task__c\"},{\"name\":\"TemplatedJobTimeConstraints\",\"label\":\"Templated Job Time Constraints\",\"mapping\":\"sked__Templated_Job_Time_Constraint__c\"},{\"name\":\"TemplatedJobs\",\"label\":\"Templated Jobs\",\"mapping\":\"sked__Templated_Job__c\"},{\"name\":\"TemplatedResourceRequirementTags\",\"label\":\"Templated Resource Requirement Tags\",\"mapping\":\"sked__Templated_Resource_Requirement_Tag__c\"},{\"name\":\"TemplatedResourceRequirements\",\"label\":\"Templated Resource Requirements\",\"mapping\":\"sked__Templated_Resource_Requirement__c\"},{\"name\":\"TemplatedResourceShifts\",\"label\":\"Templated Resource Shifts\",\"mapping\":\"sked__Templated_Resource_Shift__c\"},{\"name\":\"TemplatedShiftTags\",\"label\":\"Templated Shift Tags\",\"mapping\":\"sked__Templated_Shift_Tag__c\"},{\"name\":\"TemplatedShifts\",\"label\":\"Templated Shifts\",\"mapping\":\"sked__Templated_Shift__c\"},{\"name\":\"Users\",\"label\":\"Users\",\"mapping\":\"User\"}],\"expiry\":1605858733411}",
@@ -69,46 +72,61 @@ function App() {
     }
   }, [auth])
 
-  if (!isSked) {
-    return <div className="btn btn-success bg-white btn-block"><a href="https://new.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>
-  }
+  const openCustomFieldMapping = useCallback(() => {
+    const link = "index.html?" + customFieldMappingPage + "=" + accessToken;
+    if (window.location.port === "3000") {
+      window.open(link, "_blank")
+    } else {
+      chrome.tabs.create({ url: link });
+    }
+  }, [accessToken])
+
+  // if (!isSked && window.location.search.includes(customFieldMappingPage)) {
+  //   return <div className="btn btn-success bg-white btn-block"><a href="https://new.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>
+  // }
 
   return (
     <>
       <Context.Provider value={{ setLoading, skedLocalStorage, accessToken, idToken }}>
-        <div className={"app d-flex flex-column " + (loading && "blur")} >
-          <div className="header bg-info text-white p-2">
-            <h5 className="m-0">Sked tools by Stiger</h5>
-          </div>
-          <div className="body p-2 d-flex flex-column">
-            <div className="copy-token">
-              <h6 className="text-muted">Copy</h6>
-              <button className="btn btn-primary mr-1" onClick={() => copyTextToClipboard(accessToken)}><FontAwesomeIcon icon={faCopy} /> Session Token</button>
-              <button className="btn btn-success" onClick={() => copyTextToClipboard(idToken)}><FontAwesomeIcon icon={faCopy} /> User Token</button>
+        {!window.location.search.includes(customFieldMappingPage) && <>
+          {!isSked && <div className="btn btn-success bg-white btn-block"><a href="https://new.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>}
+          {isSked && <div className={"app d-flex flex-column " + (loading && "blur")} >
+            <div className="header bg-info text-white p-2">
+              <h5 className="m-0">Sked tools by Stiger</h5>
             </div>
+            <div className="body p-2 d-flex flex-column">
+              <div className="copy-token">
+                <h6 className="text-muted">Copy</h6>
+                <button className="btn btn-primary mr-1" onClick={() => copyTextToClipboard(accessToken)}><FontAwesomeIcon icon={faCopy} /> Session Token</button>
+                <button className="btn btn-success" onClick={() => copyTextToClipboard(idToken)}><FontAwesomeIcon icon={faCopy} /> User Token</button>
+              </div>
 
-            <div className="sked-sdk mt-2">
-              <SdkHandler accessToken={accessToken} />
-            </div>
+              <div className="sked-sdk mt-2">
+                <SdkHandler accessToken={accessToken} />
+              </div>
 
-            <div className="sked-sdk mt-2">
-              <CfHandler />
-            </div>
-            <div className="sked-sdk mt-2">
-              <h6 className="text-muted">Quick Jumps</h6>
+              <div className="sked-sdk mt-2">
+                <CfHandler />
+              </div>
+              <div className="sked-sdk mt-2">
+                <h6 className="text-muted">Quick Jumps</h6>
 
-              <div className="mr-1 mb-1" role="group">
-                <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('c/g/manage-pkg')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Manage Package </button>
-                <button className="btn btn-secondary text-white mr-1 mb-1" onClick={() => openLink('settings/dataobjects')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Custom Fields Mapping </button>
-                <button className="btn btn-success text-white mr-1 mb-1" onClick={() => openLink('settings/extensions/mobile')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Extensions </button>
-                <button className="btn btn-danger text-white mr-1 mb-1" onClick={() => openLink('settings/developer/api-token')}><FontAwesomeIcon icon={faExternalLinkAlt} /> API Token </button>
-                <button className="btn btn-warning text-white mr-1 mb-1" onClick={() => openSalesforces()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Salesforce </button>
+                <div className="mr-1 mb-1" role="group">
+                  <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('c/g/manage-pkg')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Manage Package </button>
+                  <button className="btn btn-secondary text-white mr-1 mb-1" onClick={() => openLink('settings/dataobjects')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Sked Fields Mapping </button>
+                  <button className="btn btn-success text-white mr-1 mb-1" onClick={() => openCustomFieldMapping()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Fields Mapping </button>
+                  <button className="btn btn-primary text-white mr-1 mb-1" onClick={() => openLink('settings/extensions/mobile')}><FontAwesomeIcon icon={faExternalLinkAlt} /> Extensions </button>
+                  <button className="btn btn-danger text-white mr-1 mb-1" onClick={() => openLink('settings/developer/api-token')}><FontAwesomeIcon icon={faExternalLinkAlt} /> API Token </button>
+                  <button className="btn btn-warning text-white mr-1 mb-1" onClick={() => openSalesforces()}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Salesforce </button>
 
+                </div>
               </div>
             </div>
-          </div>
+          </div>}
+        </>}
 
-        </div>
+        {window.location.search.includes(customFieldMappingPage) && <CustomFieldMapping setLoading={setLoading} />}
+
       </Context.Provider>
       {loading && <Loading />}
     </>
