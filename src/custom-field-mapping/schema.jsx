@@ -24,7 +24,9 @@ export default (props) => {
   const isFieldsShowed = React.useMemo(() => context.activeSchema === schema.name, [context.activeSchema, schema.name])
 
   const validFields = useMemo(() =>
-    [...newFields, ...fields].filter(field => field.schemaName === schema.name && field.schemaName === context.activeSchema && field.name.toLowerCase().includes(filter.toLowerCase())),
+    [...newFields, ...fields].filter(field =>
+      field.schemaName === schema.name && field.schemaName === context.activeSchema
+      && (field.label.toLowerCase().includes(filter.toLowerCase()) || field.name.toLowerCase().includes(filter.toLowerCase()))),
     [context.activeSchema, fields, newFields, filter])
 
   const toggle = React.useCallback(() => {

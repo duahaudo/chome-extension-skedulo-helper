@@ -54,7 +54,7 @@ export default ({ setLoading }) => {
 
   const [activeSchema, setactiveSchema] = useState()
 
-  const filterSchemas = React.useMemo(() => schemas.filter(item => item.name.toLowerCase().includes(filter.toLowerCase())), [filter, schemas])
+  const filterSchemas = React.useMemo(() => schemas.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()) || item.label.toLowerCase().includes(filter.toLowerCase())), [filter, schemas])
 
   return <Context.Provider value={{ instance, schemas, fields, schemaMetadatas, activeSchema, setactiveSchema, setLoading: setLoading2 }}>
     <div className="d-flex flex-column">
