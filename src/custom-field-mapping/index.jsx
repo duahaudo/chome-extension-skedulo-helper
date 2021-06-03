@@ -59,7 +59,7 @@ export default ({ setLoading }) => {
   return <Context.Provider value={{ instance, schemas, fields, schemaMetadatas, activeSchema, setactiveSchema, setLoading: setLoading2 }}>
     <div className="d-flex flex-column">
       <div className="p-2">
-        <input className="form-control" placeholder="filter" value={filter} onChange={(evt) => setFilter(evt.target.value)} />
+        <input className="form-control" placeholder="filter schema" value={filter} onChange={(evt) => setFilter(evt.target.value)} />
       </div>
       {filterSchemas.filter(item => !!item.name).map((schema, idx) => {
         const options = { schema }
