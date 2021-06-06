@@ -43,11 +43,17 @@ export default (props) => {
     if (context.schemaMetadatas && context.schemaMetadatas.length > 0) {
       const _schema = context.schemaMetadatas.find(item => item.mapping === schema.mapping)
       const _fields = _schema ? _schema.fields : []
-      const fieldsMapped = fields.map(item => item.mapping)
+      const fieldsMapped = fields.map(item => item.fieldType !== "reference" ? item.mapping : item.mapping.replace(/__r$/, "__c"))
 
-      const fieldRecentlyMapped = newFields.map(item => item.mapping) // not save yet
+      const fieldRecentlyMapped = newFields.map(item => item.fieldType !== "reference" ? item.mapping : item.mapping.replace(/__r$/, "__c")) // not save yet
       const notValidFields = [...fieldsMapped, ...fieldRecentlyMapped]
 
+      // if (schema.name === "MedicationStatement") {
+      //   console.log(fieldsMapped)
+      //   console.log(fields.filter(item => item.fieldType === "reference"))
+      //   console.log(notValidFields.filter(item => item.includes("Transcare_Form")))
+      //   console.log(_fields.filter(item => item.mapping.includes("Transcare_Form")))
+      // }
       return _fields.filter(item => notValidFields.indexOf(item.mapping) === -1)
     }
     return []
