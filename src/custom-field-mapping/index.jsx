@@ -41,6 +41,8 @@ export default ({ setLoading }) => {
         await Promise.resolve(mock)
         : await Promise.all(schemasMapping.map(mapping => instance.get(`custom/metadata/${mapping}?force=true`).then(res => res.data.result)))
 
+      // console.log(schemaMetadataResult)
+
       return { schemas: allSchemas, fields: _fields, metadata: schemaMetadataResult }
     }
 

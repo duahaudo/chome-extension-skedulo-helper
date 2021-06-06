@@ -12,7 +12,7 @@ export default (props) => {
   const context = React.useContext(Context)
 
   const [schema, setSchema] = useState(props.schema)
-  const [fields, setFields] = useState(context.fields)
+  const [fields, setFields] = useState([])
   const [newFields, setNewFields] = useState([])
   const [delFields, setDelFields] = useState([])
   const [updateFields, setUpdateFields] = useState([])
@@ -20,7 +20,7 @@ export default (props) => {
 
   useEffect(() => {
     setSchema(props.schema)
-    setFields(context.fields)
+    setFields(context.fields.filter(item => item.schemaName === schema.name))
   }, [context.fields, props.schema])
 
   const isFieldsShowed = React.useMemo(() => context.activeSchema === schema.name, [context.activeSchema, schema.name])
@@ -44,8 +44,10 @@ export default (props) => {
       const _schema = context.schemaMetadatas.find(item => item.mapping === schema.mapping)
       const _fields = _schema ? _schema.fields : []
       const fieldsMapped = fields.map(item => item.mapping)
-      const fieldRecentlyMapped = newFields.map(item => item.mapping)
+
+      const fieldRecentlyMapped = newFields.map(item => item.mapping) // not save yet
       const notValidFields = [...fieldsMapped, ...fieldRecentlyMapped]
+
       return _fields.filter(item => notValidFields.indexOf(item.mapping) === -1)
     }
     return []
