@@ -28,7 +28,7 @@ export default (props) => {
   const validFields = useMemo(() =>
     [...newFields, ...fields].filter(field =>
       field.schemaName === schema.name && field.schemaName === context.activeSchema
-      && (field.label.toLowerCase().includes(filter.toLowerCase()) || field.name.toLowerCase().includes(filter.toLowerCase()))),
+      && ((field.label || "").toLowerCase().includes(filter.toLowerCase()) || (field.name || "").toLowerCase().includes(filter.toLowerCase()))),
     [context.activeSchema, fields, newFields, filter])
 
   const toggle = React.useCallback(() => {
@@ -92,6 +92,7 @@ export default (props) => {
 
         let hasManyMapping = {
           name: formattedName + "s",
+          label,
           schemaName: referenceSchema.name,
           fieldType: "reference",
           referenceSchemaName: schema.name
@@ -101,8 +102,11 @@ export default (props) => {
         const hasManyMappingValue = schemaMetadata.relationships.find(item => item.schemaMapping === schema.mapping && item.fieldMapping === relationship.schemaMapping)
 
         if (hasManyMappingValue) {
+
           hasManyMapping = {
             ...hasManyMapping,
+            name: props.schema.name + "s",
+            label: props.schema.label,
             mapping: hasManyMappingValue.mapping,
             referenceSchemaFieldName: formattedName + "Id"
           }
