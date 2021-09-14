@@ -60,6 +60,7 @@ export default (props) => {
   }, [context.schemaMetadatas, schema.mapping, newFields, fields])
 
   const [newMappingField, setNewMappingField] = useState()
+
   const newCustomMappingFieldHandler = React.useCallback(() => {
     const { name, label, type, mapping, relationship, upsertKey, accessMode, readOnly, maxLength, precision, scale } = newMappingField
     const newMappings = []
@@ -199,7 +200,7 @@ export default (props) => {
     <div className={" border-bottom d-flex m-2 p-2 justify-content-between " + (isFieldsShowed ? 'text-success border-success' : 'text-secondary')}>
       <div className="d-flex  align-items-center">
         <FontAwesomeIcon onClick={toggle} icon={isFieldsShowed ? faChevronUp : faChevronDown} className="mr-3 ml-2" />
-        <div className=" font-weight-bold"><span onClick={toggle}>{schema.label}</span> - {schema.name}</div>
+        <div className=" font-weight-bold"><span onClick={toggle}>{schema.label}</span> - {schema.name} ({schema.mapping})</div>
       </div>
       {isFieldsShowed && <div className="input-group-sm d-flex col-4 pr-0">
         <input className="form-control" placeholder="filter field" value={filter} onChange={(evt) => setFilter(evt.target.value)} />
