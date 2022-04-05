@@ -6,11 +6,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faStop, faExternalLinkAlt, faCube, faBoxOpen, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import useQuery from "../hook/useQuery"
 import useApiInstance from '../hook/useApiInstance'
+import Loading from "../loading"
 
 export default ({ accessToken }) => {
 
   const [startPkg, setQueryStarPkg] = useState({})
-  const [starting, fetchData] = useQuery({ token: accessToken, options: startPkg })
+  const [starting] = useQuery({ token: accessToken, options: startPkg })
 
   const [getBuildPkgs, setGetBuildPkgs] = useState({})
   const [loadingBuildPkgs, buildPkgs] = useQuery({ options: getBuildPkgs })
@@ -128,5 +129,7 @@ export default ({ accessToken }) => {
         </button>
       })}
     </div>
+
+    {(starting || loadingBuildPkgs || loadingBuildStatus || loadingTurnOnMangePkg) && <Loading />}
   </>
 }

@@ -6,20 +6,29 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Schema from "./schema"
 import Context from "./dataContext"
 import Loading from "../loading"
-import useApiInstance from "../hook/useApiInstance"
+
+import { tokenKey, apiKey } from "../main"
 
 const mock = require("./mock.json")
 
+const getParams = () => {
+  const searchQuery = window.location.search.substring(1);
+  const conditions = searchQuery.split("&")
+  return conditions.reduce((result, condition) => {
+    const [key, value] = condition.split("=")
+    return _.assign(result, { [key]: value })
+  }, {})
+}
+
 export default ({ setLoading }) => {
 
-  const instance_url = useApiInstance()
-  const [, accessToken] = window.location.search.split('=')
+  const params = getParams()
   const instance = useMemo(() => axios.create({
-    baseURL: instance_url,
+    baseURL: params[apiKey],
     headers: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${params[tokenKey]}`
     }
-  }), [accessToken])
+  }), [params])
 
   const [schemas, setSchemas] = useState([])
   const [fields, setFields] = useState([])

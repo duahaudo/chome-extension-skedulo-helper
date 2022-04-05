@@ -13,7 +13,8 @@ import CfHandler from "../cf-handler"
 
 import CustomFieldMapping from "../custom-field-mapping"
 
-const customFieldMappingPage = 'custom-field-mapping'
+export const tokenKey = 'token'
+export const apiKey = "api"
 
 const mock = {
   "ajs_user_id": "\"auth0|61e12297002b2e00711ae916\"",
@@ -92,18 +93,22 @@ function App() {
   }, [auth])
 
   const openCustomFieldMapping = useCallback(() => {
-    const link = "index.html?" + customFieldMappingPage + "=" + accessToken;
+    const params = [
+      [tokenKey, accessToken],
+      [apiKey, auth.sfdc.instance_url],
+    ]
+    const link = "index.html?" + params.map(item => item.join("=")).join("&");
     if (window.location.port === "3000") {
       window.open(link, "_blank")
     } else {
       chrome.tabs.create({ url: link });
     }
-  }, [accessToken])
+  }, [accessToken, auth])
 
   return (
     <>
       <Context.Provider value={{ setLoading, skedLocalStorage, accessToken, idToken }}>
-        {!window.location.search.includes(customFieldMappingPage) && !loading && <>
+        {!window.location.search.includes(tokenKey) && !loading && <>
           {!isSked && <div className="btn btn-success bg-white btn-block"><a href="https://app.skedulo.com/"><FontAwesomeIcon icon={faExternalLinkSquareAlt} /> Skedulo </a></div>}
           {isSked && <div className={"app d-flex flex-column " + (loading && "blur")} >
             <div className="header bg-info text-white p-2">
@@ -140,7 +145,7 @@ function App() {
           </div>}
         </>}
 
-        {window.location.search.includes(customFieldMappingPage) && <CustomFieldMapping setLoading={setLoading} />}
+        {window.location.search.includes(tokenKey) && <CustomFieldMapping setLoading={setLoading} />}
 
       </Context.Provider>
       {loading && <Loading />}
