@@ -1,19 +1,21 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
 import Context from "../context"
 import axios from "axios"
+import useApiInstance from './useApiInstance'
 
 export default ({ options }) => {
   const { accessToken } = useContext(Context)
+  const instance_url = useApiInstance()
   const [loading, setLoading] = useState(false)
   const [fetchedData, setFetchedData] = useState()
 
   const instance = useMemo(() => axios.create({
-    baseURL: "https://api.skedulo.com",
+    baseURL: instance_url,
     headers: {
       ...(options.headers || {}),
       Authorization: `Bearer ${accessToken}`
     }
-  }), [accessToken, options.headers])
+  }), [accessToken, options.headers, instance_url])
 
   useEffect(() => {
     // console.log(options)

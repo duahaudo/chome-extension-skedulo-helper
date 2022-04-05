@@ -8,23 +8,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faLink, faTimes, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import $ from "jquery"
 import { each } from "lodash"
+import Loading from "../loading"
 
 import useQuery from "../hook/useQuery"
 import Context from "../context"
 import ManageCF from "./manageCustomForm"
-
-const getLink = (jobType) => `https://api.skedulo.com/api/Jobs?limit=3&filter=(JobStatus != "Complete" AND JobStatus != "Cancelled" ${jobType ? ` AND Type == "${jobType}"` : ""})&fieldNames=UID, Name&onlyFields=true&orderBy=Name DESC`
+import useApiInstance from "../hook/useApiInstance"
 
 export default () => {
 
-  const { setLoading, idToken } = useContext(Context)
-  const [queryOptions, setQueryOptions] = useState({})
-  const [loading, fetchedData] = useQuery({ options: queryOptions })
+  const instance_url = useApiInstance()
+  const { idToken } = useContext(Context)
+
+  const [queryForms, setQueryForms] = useState({})
+  const [loadingForms, managedForms] = useQuery({ options: queryForms })
+
+  const [queryJobs, setQueryJobs] = useState({})
+  const [loadingJobs, jobs] = useQuery({ options: queryJobs })
+
+  const [uploadForm, setQueryUploadForm] = useState({})
+  const [loadingUpload] = useQuery({ options: uploadForm })
+
   const [markDownload, setMarkDownload] = useState(false)
   const [showManage, setShowManage] = useState(false)
-  const [forms, setForms] = useState([])
 
   const ref = useRef(null)
+
+  const getLink = useCallback((jobType) => `${instance_url}/api/Jobs?limit=3&filter=(JobStatus != "Complete" AND JobStatus != "Cancelled" ${jobType ? ` AND Type == "${jobType}"` : ""})&fieldNames=UID, Name&onlyFields=true&orderBy=Name DESC`, [instance_url])
 
   const uploadHandler = useCallback(() => {
     var input = document.createElement('input');
@@ -41,7 +51,7 @@ export default () => {
       var bodyFormData = new FormData();
       bodyFormData.set('file', file);
 
-      setQueryOptions({
+      setQueryUploadForm({
         api: "/centrifuge/util/deploy-form",
         method: "post",
         data: bodyFormData,
@@ -52,82 +62,66 @@ export default () => {
     }
   }, [])
 
-  useEffect(() => {
-    setLoading(loading)
-  }, [loading, setLoading])
+  const showPanel = useCallback((show) => {
+    setShowManage(show)
+    setTimeout(() => {
+      if (ref.current) {
+        $(ref.current)[show ? "slideDown" : "slideUp"]()
+      }
+    }, 400)
+
+  }, [ref.current])
 
   const viewCFPanelHandler = useCallback(() => {
-    const newState = !showManage
 
-    if (newState) {
-      setQueryOptions({
-        api: "/customform/form",
-        type: "get",
-        timestampe: Date.now()
-      })
-      // setMarkDownload(true)
-    } else {
-      $(ref.current)[newState ? "slideDown" : "slideUp"]()
-      setTimeout(() => setShowManage(newState), 400)
-    }
+    setQueryForms({
+      api: "/customform/form",
+      type: "get",
+      timestampe: Date.now()
+    })
+    // setMarkDownload(true)
 
-  }, [showManage])
+    showPanel(true)
+
+  }, [showManage, queryForms])
 
   // loading list custom form
   useEffect(() => {
-    if (!loading && markDownload) {
-      setShowManage(true)
+    if (!loadingUpload && markDownload) {
+      showPanel(true)
 
       setTimeout(() => {
         $(ref.current).slideDown()
         setMarkDownload(false)
       }, 400)
     }
-  }, [loading, markDownload])
-
-  const [queryJob, setQueryJob] = useState(getLink())
-
-  useEffect(() => {
-    if (!loading) {
-      switch (queryOptions.api) {
-        case "/customform/form": {
-          if (queryOptions.type === 'get' && fetchedData && fetchedData.result) {
-            // console.log(queryOptions, fetchedData.result)
-            setForms(fetchedData.result)
-            setMarkDownload(true)
-          }
-          break;
-        }
-        case queryJob: {
-          if (fetchedData && fetchedData.Jobs.records) {
-            const job = fetchedData.Jobs.records[0];
-            console.log(job.UID)
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` }, (tab) => {
-                chrome.tabs.executeScript(tab.id, { code: `SetIdToken("${idToken}")` });
-              })
-            })
-          }
-          break;
-        }
-        default:
-      }
-    }
-
-  }, [fetchedData, queryOptions, loading, queryJob, idToken])
-
-  // useEffect(() => {
-  //   console.log('forms', forms)
-  // }, [forms])
+  }, [loadingUpload, markDownload])
 
   const openJobHandler = useCallback((type) => {
-    setQueryJob(getLink(type))
-    setQueryOptions({
+    // setQueryJob(getLink(type))
+    setQueryJobs({
       api: getLink(type),
       type: "get",
       timestampe: Date.now()
     })
-  }, [])
+  }, [queryJobs])
+
+  useEffect(() => {
+    if (jobs && jobs.Jobs.records) {
+      const [job] = jobs.Jobs.records;
+      console.log(job.UID)
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` }, (tab) => {
+          chrome.tabs.executeScript(tab.id, { code: `SetIdToken("${idToken}")` });
+        })
+      })
+    }
+  }, [jobs, idToken])
+
+  useEffect(() => {
+
+    console.log(`👉  SLOG (${new Date().toLocaleTimeString()}): 🏃‍♂️ managedForms`, showManage)
+  }, [showManage])
 
   return (
     <div className="cf-wrapper">
@@ -145,9 +139,11 @@ export default () => {
       <button className="btn btn-secondary mr-1" onClick={() => viewCFPanelHandler()}><FontAwesomeIcon icon={faLink} /> Manage </button>
 
       {showManage && <div ref={ref} className="panel">
-        <ManageCF forms={forms} setForms={setForms} />
-        <button className="btn btn-dark m-2 float-right" onClick={() => viewCFPanelHandler()}><FontAwesomeIcon icon={faTimes} /> Close </button>
+        <ManageCF forms={managedForms ? managedForms.result : []} refresh={() => viewCFPanelHandler()} />
+        <button className="btn btn-dark m-2 float-right" onClick={() => showPanel(false)}>
+          <FontAwesomeIcon icon={faTimes} /> Close </button>
       </div>}
+      {(loadingForms || loadingJobs || loadingUpload) && <Loading />}
     </div>
   )
 }
