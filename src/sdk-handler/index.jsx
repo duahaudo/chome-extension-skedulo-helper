@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faStop, faExternalLinkAlt, faCube, faBoxOpen, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import useQuery from "../hook/useQuery"
 import Context from "../context"
+import useApiInstance from '../hook/useApiInstance'
 
 export default ({ accessToken }) => {
 
@@ -17,12 +18,14 @@ export default ({ accessToken }) => {
   const [pkgStatus, setPkgStatus] = useState(null)
   const [currentPkg, setCurrentPkg] = useState(null)
 
+  const instance_url = useApiInstance()
+
   const startSdk = useCallback(
     () => {
       setQueryOptions({
         api: "https://localhost:1928/session/start",
         method: "post",
-        data: { "REALTIME_SERVER": "https://api.skedulo.com", "API_SERVER": "https://api.skedulo.com" }
+        data: { "REALTIME_SERVER": instance_url, "API_SERVER": instance_url }
       })
     },
     [],

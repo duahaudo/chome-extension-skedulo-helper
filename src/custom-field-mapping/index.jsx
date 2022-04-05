@@ -6,14 +6,16 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Schema from "./schema"
 import Context from "./dataContext"
 import Loading from "../loading"
+import useApiInstance from "../hook/useApiInstance"
 
 const mock = require("./mock.json")
 
 export default ({ setLoading }) => {
 
+  const instance_url = useApiInstance()
   const [, accessToken] = window.location.search.split('=')
   const instance = useMemo(() => axios.create({
-    baseURL: "https://api.skedulo.com",
+    baseURL: instance_url,
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
@@ -36,6 +38,7 @@ export default ({ setLoading }) => {
 
       const allSchemas = [..._schemas, ..._schemas2]
       const schemasMapping = allSchemas.map(item => item.mapping)
+      // console.log(`👉  SLOG (${new Date().toLocaleTimeString()}): 🏃‍♂️ queryData 🏃‍♂️ schemasMapping`, schemasMapping)
 
       const schemaMetadataResult = window.location.port === "3000" ?
         await Promise.resolve(mock)
@@ -50,6 +53,11 @@ export default ({ setLoading }) => {
       setSchemas(schemas)
       setFields(fields)
       setschemaMetadatas(metadata)
+      setLoading(false)
+    }, error => {
+      console.log(`👉  SLOG (${new Date().toLocaleTimeString()}): 🏃‍♂️ queryData 🏃‍♂️ error`, error)
+
+    }).finally(() => {
       setLoading(false)
     })
   }, [instance])

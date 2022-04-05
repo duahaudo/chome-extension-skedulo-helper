@@ -1,25 +1,26 @@
-import React, { useCallback, useState, useContext, useEffect } from 'react'
+import { faEllipsisV, faSave, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrashAlt, faSave, faEllipsisV, faFileDownload } from '@fortawesome/free-solid-svg-icons'
 import _ from "lodash"
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Select from 'react-select'
-import useQuery from "../hook/useQuery"
-import useDownload from "../hook/useDownload"
 import Context from "../context"
+import useQuery from "../hook/useQuery"
+import Loading from "../loading"
 
-export default ({ forms, setForms }) => {
-  const { skedLocalStorage, setLoading } = useContext(Context)
+export default ({ forms, refresh }) => {
+  const { skedLocalStorage } = useContext(Context)
   const jobTypes = JSON.parse(skedLocalStorage["sked-default.schemaVocab"]).value.Jobs.Type
-  const [queryOptions, setQueryOptions] = useState({})
-  const [loading, fetchedData] = useQuery({ options: queryOptions })
+
+  const [linkJobTypeOptions, setLinkJobTypeOptions] = useState({})
+  const [linkJobTypeLoading] = useQuery({ options: linkJobTypeOptions })
+
+  const [deleteForm, setQueryDeleteForm] = useState({})
+  const [deleting] = useQuery({ options: deleteForm })
+
   const [linkForms, setLinkForms] = useState([])
 
-  const [downloadOpt, setDownloadOpt] = useState("")
-  const [loading2, fetchedDownload] = useDownload(downloadOpt)
-
-  useEffect(() => {
-    setLoading(loading)
-  }, [loading, setLoading])
+  // const [downloadOpt, setDownloadOpt] = useState("")
+  // const [loading2, fetchedDownload] = useDownload(downloadOpt)
 
   const linkFormHandler = useCallback((formId, selectedOptions) => {
     // console.log(selectedOptions)
@@ -65,31 +66,29 @@ export default ({ forms, setForms }) => {
       })
     })
 
-    setQueryOptions({
+    setLinkJobTypeOptions({
       bulkQuery: true,
       options
     })
   }, [linkForms])
 
   const removeForm = useCallback((form) => {
-    setQueryOptions({
+    setQueryDeleteForm({
       api: "/customform/form/" + form.formRev.formId,
       method: "DELETE"
     })
 
-    const newFormLst = _.reject(forms, item => item.formRev.formId === form.formRev.formId)
-    setForms(newFormLst)
-  }, [forms, setForms])
-
-  const downloadForm = useCallback((form) => {
-    setDownloadOpt(form.formRev.id)
-  }, [])
+  }, [forms])
 
   useEffect(() => {
-    if (!loading2 && !!fetchedData) {
-      console.log(fetchedData)
+    if (!deleting) {
+      refresh()
     }
-  }, [fetchedData])
+  }, [deleting])
+
+  // const downloadForm = useCallback((form) => {
+  //   setDownloadOpt(form.formRev.id)
+  // }, [])
 
   return (
     <div className="lst-custom-form">
@@ -104,12 +103,16 @@ export default ({ forms, setForms }) => {
             <SelectComp jobTypes={jobTypes} disabled={isMenuForm} existSelected={formJobTypes} onChange={(selectedOptions) => linkFormHandler(form.id, selectedOptions)} />
           </div>
           <div className="align-self-center d-flex">
-            <button className="btn-sm bg-primary border-0 text-white m-1" onClick={() => saveFormLink(form)}><FontAwesomeIcon icon={faSave} /> </button>
+            <button className="btn-sm bg-primary border-0 text-white m-1" onClick={() => saveFormLink(form)}>
+              <FontAwesomeIcon icon={faSave} /> </button>
             {/* <button className="btn-sm bg-success border-0 text-white m-1" onClick={() => downloadForm(form)}><FontAwesomeIcon icon={faFileDownload} /> </button> */}
-            <button className="btn-sm bg-danger border-0 text-white m-1" onClick={() => removeForm(form)}><FontAwesomeIcon icon={faTrashAlt} /> </button>
+            <button className="btn-sm bg-danger border-0 text-white m-1" onClick={() => removeForm(form)}>
+              <FontAwesomeIcon icon={faTrashAlt} /> </button>
           </div>
         </div>
       })}
+
+      {(linkJobTypeLoading || deleting) && <Loading />}
     </div>
   )
 }
