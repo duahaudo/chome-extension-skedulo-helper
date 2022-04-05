@@ -5,24 +5,31 @@ import React, { useState, useEffect, useCallback, useContext, useMemo } from 're
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faStop, faExternalLinkAlt, faCube, faBoxOpen, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import useQuery from "../hook/useQuery"
-import Context from "../context"
 import useApiInstance from '../hook/useApiInstance'
 
 export default ({ accessToken }) => {
 
-  const [queryOptions, setQueryOptions] = useState({})
-  const [loading, fetchData] = useQuery({ token: accessToken, options: queryOptions })
-  const { setLoading } = useContext(Context)
+  const [startPkg, setQueryStarPkg] = useState({})
+  const [starting, fetchData] = useQuery({ token: accessToken, options: startPkg })
 
-  const [buildPkgs, setBuildPkgs] = useState([])
-  const [pkgStatus, setPkgStatus] = useState(null)
+  const [getBuildPkgs, setGetBuildPkgs] = useState({})
+  const [loadingBuildPkgs, buildPkgs] = useQuery({ options: getBuildPkgs })
+
+  const [queryBuildStatus, setQueryBuildStatus] = useState({})
+  const [loadingBuildStatus, pkgStatus] = useQuery({ options: queryBuildStatus })
+
+  const [queryTurnOnManagePkg, setQueryTurnOnManagePkg] = useState({})
+  const [loadingTurnOnMangePkg] = useQuery({ options: queryTurnOnManagePkg })
+
+  // const [buildPkgs, setBuildPkgs] = useState([])
+  // const [pkgStatus, setPkgStatus] = useState(null)
   const [currentPkg, setCurrentPkg] = useState(null)
 
   const instance_url = useApiInstance()
 
   const startSdk = useCallback(
     () => {
-      setQueryOptions({
+      setQueryStarPkg({
         api: "https://localhost:1928/session/start",
         method: "post",
         data: { "REALTIME_SERVER": instance_url, "API_SERVER": instance_url }
@@ -33,7 +40,7 @@ export default ({ accessToken }) => {
 
   const stopSdk = useCallback(
     () => {
-      setQueryOptions({
+      setQueryStarPkg({
         api: "https://localhost:1928/session/stop",
         method: "post"
       })
@@ -41,63 +48,50 @@ export default ({ accessToken }) => {
     [],
   )
 
-  useEffect(() => {
-    setLoading(loading)
-    return () => { }
-  }, [loading, setLoading])
-
   const [managePkgStatus, setManagePkgStatus] = useState(false)
 
   const getAllBuildPkgs = useCallback(() => {
-    setQueryOptions({
+    setGetBuildPkgs({
       api: "/pkg/installed",
       method: "get"
     })
   }, [])
 
-  const getBuildStatus = useCallback((pkg) => {
-    if (!currentPkg || (pkg.id !== currentPkg.id)) {
-      setCurrentPkg(pkg)
-      setQueryOptions({
-        api: "/pkg/builds",
-        method: "get",
-        param: { name: pkg.name }
-      })
-    } else {
-      setCurrentPkg(null)
-    }
-  }, [currentPkg])
-
-  const refreshStatus = useCallback(() => {
-    setQueryOptions({
+  const refreshStatus = useCallback((pkg) => {
+    setCurrentPkg(pkg)
+    const { name } = pkg
+    setQueryBuildStatus({
       api: "/pkg/builds",
       method: "get",
-      param: { name: currentPkg.name }
+      param: { name }
     })
-  }, [currentPkg])
+  }, [])
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (!loading && !!fetchData) {
-      switch (queryOptions.api) {
-        case "/pkg/installed":
-          setBuildPkgs(fetchData.result)
-          break;
+  //   if (!starting && !!fetchData) {
+  //     switch (startPkg.api) {
+  //       case "/pkg/installed":
+  //         setBuildPkgs(fetchData.result)
+  //         break;
 
-        case "/pkg/builds":
-          setPkgStatus(fetchData.result[0] || null)
-          break;
+  //       case "/pkg/builds":
+  //         setPkgStatus(fetchData.result[0] || null)
+  //         break;
 
-        default:
-      }
-    }
+  //       default:
+  //     }
+  //   }
 
-  }, [fetchData, queryOptions, loading])
+  // }, [fetchData, startPkg, starting])
+
+  const installedPackaged = useMemo(() => buildPkgs ? buildPkgs.result : [], [buildPkgs])
 
   return <>
     <h6 className="text-muted">SDK</h6>
     <button className="btn btn-primary mr-1 mt-1" onClick={() => startSdk()}><FontAwesomeIcon icon={faPlay} /> Start </button>
     <button className="btn btn-secondary mr-1 mt-1" onClick={() => stopSdk()}><FontAwesomeIcon icon={faStop} /> End</button>
+
     <button className="btn btn-success mr-1 mt-1" onClick={() => {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const tab = tabs[0]
@@ -106,9 +100,10 @@ export default ({ accessToken }) => {
         chrome.tabs.create({ url: `${protocols}//${domain}/c-dev/` });
       })
     }}><FontAwesomeIcon icon={faExternalLinkAlt} /> Open Dev </button>
+
     <button className="btn btn-warning mr-1 mt-1" onClick={() => {
-      setQueryOptions({
-        api: "/package/global/manage-pkg",
+      setQueryTurnOnManagePkg({
+        api: "/package/global/manage-pkgs",
         method: "put",
         data: {
           active: !managePkgStatus
@@ -118,13 +113,19 @@ export default ({ accessToken }) => {
     }}><FontAwesomeIcon icon={faCube} /> Turn On Manage Pkg</button>
 
     <div className="btn-group mr-1 mt-1" role="group">
-      <button className="btn btn-primary text-white" onClick={() => getAllBuildPkgs()}><FontAwesomeIcon icon={faBoxOpen} /> Packages </button>
+      <button className="btn btn-primary text-white" onClick={() => getAllBuildPkgs()}>
+        <FontAwesomeIcon icon={faBoxOpen} /> Packages </button>
 
-      {buildPkgs.map((pkg, idx) => {
+      {installedPackaged.map((pkg, idx) => {
         return <button className="btn btn-info" key={idx}>
           <FontAwesomeIcon icon={currentPkg && (pkg.id === currentPkg.id) ? faEye : faEyeSlash} />
-          <span onClick={() => getBuildStatus(pkg)}> {pkg.name} </span>
-          <span onClick={() => refreshStatus()}><small className="status"> {currentPkg && pkgStatus && (pkg.id === currentPkg.id) ? pkgStatus.status : ""} </small></span></button>
+          <span onClick={() => refreshStatus(pkg)}> {pkg.name} </span>
+          <span>
+            <small className="status">
+              {currentPkg && pkgStatus && (pkg.id === currentPkg.id) ? pkgStatus.result[0].status : ""}
+            </small>
+          </span>
+        </button>
       })}
     </div>
   </>

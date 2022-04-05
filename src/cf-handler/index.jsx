@@ -1,19 +1,19 @@
 // @ts-nocheck
 /*global chrome*/
 
-import "./style.scss"
-
-import React, { useCallback, useState, useContext, useEffect, useRef, useMemo } from 'react'
+import { faExternalLinkAlt, faLink, faTimes, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faLink, faTimes, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import $ from "jquery"
 import { each } from "lodash"
-import Loading from "../loading"
-
-import useQuery from "../hook/useQuery"
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import Context from "../context"
-import ManageCF from "./manageCustomForm"
 import useApiInstance from "../hook/useApiInstance"
+import useQuery from "../hook/useQuery"
+import Loading from "../loading"
+import ManageCF from "./manageCustomForm"
+import "./style.scss"
+
+
 
 export default () => {
 
@@ -109,19 +109,18 @@ export default () => {
   useEffect(() => {
     if (jobs && jobs.Jobs.records) {
       const [job] = jobs.Jobs.records;
-      console.log(job.UID)
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` }, (tab) => {
-          chrome.tabs.executeScript(tab.id, { code: `SetIdToken("${idToken}")` });
+
+      if (job) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.create({ url: `http://localhost:9050/form/index.html#${job.UID}/0` }, (tab) => {
+            chrome.tabs.executeScript(tab.id, { code: `SetIdToken("${idToken}")` });
+          })
         })
-      })
+      } else {
+        alert(`Job not found.`)
+      }
     }
   }, [jobs, idToken])
-
-  useEffect(() => {
-
-    console.log(`👉  SLOG (${new Date().toLocaleTimeString()}): 🏃‍♂️ managedForms`, showManage)
-  }, [showManage])
 
   return (
     <div className="cf-wrapper">

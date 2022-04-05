@@ -2,7 +2,7 @@ $vals: 1, 2, 3, 4, 5;
 
 @each $val in $vals {
   .flex-#{$val} {
-    flex: $val / 10;
+    flex: calc($val / 10);
   }
 }
 
