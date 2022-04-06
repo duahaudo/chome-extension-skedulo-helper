@@ -95,7 +95,7 @@ function App() {
   const openCustomFieldMapping = useCallback(() => {
     const params = [
       [tokenKey, accessToken],
-      [apiKey, auth.sfdc.instance_url],
+      [apiKey, JSON.parse(skedLocalStorage.team_env).server.api],
     ]
     const link = "index.html?" + params.map(item => item.join("=")).join("&");
     if (window.location.port === "3000") {
@@ -103,7 +103,7 @@ function App() {
     } else {
       chrome.tabs.create({ url: link });
     }
-  }, [accessToken, auth])
+  }, [accessToken, skedLocalStorage])
 
   return (
     <>

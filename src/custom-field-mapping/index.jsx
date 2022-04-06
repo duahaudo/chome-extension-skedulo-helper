@@ -69,7 +69,7 @@ export default ({ setLoading }) => {
     }).finally(() => {
       setLoading(false)
     })
-  }, [instance])
+  }, [])
 
   const [activeSchema, setactiveSchema] = useState()
 
